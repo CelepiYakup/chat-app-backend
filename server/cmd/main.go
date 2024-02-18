@@ -8,6 +8,6 @@ import (
 func main() {
 	_, err := db.NewDatabase()
 	if err != nil {
-		log.Fatalf("Database connection initialize could not working : %s", err)
+		log.Fatalf("Database could note initialize to connection: %s", err)
 	}
 }
