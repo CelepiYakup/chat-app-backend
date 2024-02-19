@@ -6,15 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var r *gin.Engine
+var a *gin.Engine
 
 func Initrouter(userHandler *user.Handler) {
-	r = gin.Default()
+	a = gin.Default()
 
-	r.POST("/signup", userHandler.CreateUser)
+	a.POST("/signup", userHandler.CreateUser)
 
 }
 
 func Start(addr string) error {
-	return r.Run(addr)
+	return a.Run(addr)
 }
