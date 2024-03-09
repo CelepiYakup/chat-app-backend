@@ -9,18 +9,20 @@ type Room struct {
 type Hub struct {
 	Rooms      map[string]*Room
 	Register   chan *Client
-	UnRegister chan *Client
+	Unregister chan *Client
 	Broadcast  chan *Message
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		Rooms: make(map[string]*Room),
+		Rooms:      make(map[string]*Room),
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Broadcast:  make(chan *Message, 5),
 	}
 }
 
 func (h *Hub) Run() {
-
 	for {
 		select {
 		case cl := <-h.Register:
@@ -28,12 +30,10 @@ func (h *Hub) Run() {
 				r := h.Rooms[cl.RoomID]
 
 				if _, ok := r.Clients[cl.ID]; !ok {
-
 					r.Clients[cl.ID] = cl
 				}
-
 			}
-		case cl := <-h.UnRegister:
+		case cl := <-h.Unregister:
 			if _, ok := h.Rooms[cl.RoomID]; ok {
 				if _, ok := h.Rooms[cl.RoomID].Clients[cl.ID]; ok {
 					if len(h.Rooms[cl.RoomID].Clients) != 0 {
@@ -56,7 +56,6 @@ func (h *Hub) Run() {
 					cl.Message <- m
 				}
 			}
-
 		}
 	}
 }

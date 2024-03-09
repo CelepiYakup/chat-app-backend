@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 const (
@@ -54,7 +54,7 @@ func (s *service) CreateUser(c context.Context, req *CreateUserReq) (*CreateUser
 	return res, nil
 }
 
-type JWTClaims struct {
+type MyJWTClaims struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 	jwt.RegisteredClaims
@@ -62,7 +62,6 @@ type JWTClaims struct {
 
 func (s *service) Login(c context.Context, req *LoginUserReq) (*LoginUserRes, error) {
 	ctx, cancel := context.WithTimeout(c, s.timeout)
-
 	defer cancel()
 
 	u, err := s.Repository.GetUserByEmail(ctx, req.Email)
@@ -75,12 +74,12 @@ func (s *service) Login(c context.Context, req *LoginUserReq) (*LoginUserRes, er
 		return &LoginUserRes{}, err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, JWTClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, MyJWTClaims{
 		ID:       strconv.Itoa(int(u.ID)),
 		Username: u.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    strconv.Itoa(int(u.ID)),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(12 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	})
 
@@ -89,6 +88,5 @@ func (s *service) Login(c context.Context, req *LoginUserReq) (*LoginUserRes, er
 		return &LoginUserRes{}, err
 	}
 
-	return &LoginUserRes{accesToken: ss, Username: u.Username, ID: strconv.Itoa(int(u.ID))}, nil
-
+	return &LoginUserRes{accessToken: ss, Username: u.Username, ID: strconv.Itoa(int(u.ID))}, nil
 }

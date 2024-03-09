@@ -30,14 +30,14 @@ func (c *Client) writeMessage() {
 		if !ok {
 			return
 		}
+
 		c.Conn.WriteJSON(message)
 	}
 }
 
 func (c *Client) readMessage(hub *Hub) {
-
 	defer func() {
-		hub.UnRegister <- c
+		hub.Unregister <- c
 		c.Conn.Close()
 	}()
 
@@ -58,5 +58,4 @@ func (c *Client) readMessage(hub *Hub) {
 
 		hub.Broadcast <- msg
 	}
-
 }

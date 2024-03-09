@@ -4,8 +4,8 @@ import (
 	"log"
 	"server/db"
 	"server/internal/user"
+	"server/internal/ws"
 	"server/router"
-	"server/ws"
 )
 
 func main() {
@@ -22,6 +22,6 @@ func main() {
 	wsHandler := ws.NewHandler(hub)
 	go hub.Run()
 
-	router.Initrouter(userHandler, wsHandler)
+	router.InitRouter(userHandler, wsHandler)
 	router.Start("0.0.0.0:8080")
 }
